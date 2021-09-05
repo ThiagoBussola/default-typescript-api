@@ -60,8 +60,7 @@ class UsersDao {
   }
 
   async updateUserById (userId: string, userFields: PatchUserDto | PutUserDto) {
-    const existingUser = await this.User.findByIdAndUpdate(
-      { _id: userId },
+    const existingUser = await this.User.findByIdAndUpdate(userId,
       { $set: userFields },
       { new: true }
     ).exec()
@@ -70,7 +69,7 @@ class UsersDao {
   }
 
   async removeUserById (userId: string) {
-    return await this.User.deleteOne({ _id: userId }).exec()
+    return await this.User.findByIdAndDelete(userId).select('-password').exec()
   }
 }
 
