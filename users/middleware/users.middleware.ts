@@ -19,19 +19,6 @@ class UsersMiddleware {
     }
   }
 
-  async userCantChangePermission (req: express.Request, res: express.Response, next: express.NextFunction) {
-    if (
-      'permissionFlags' in req.body &&
-            req.body.permissionFlags !== res.locals.user.permissionFlags
-    ) {
-      res.status(400).send({
-        errors: ['User cannot change permission flags']
-      })
-    } else {
-      next()
-    }
-  }
-
   // Here we need to use an arrow function to bind `this` correctly
   validatePatchEmail = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
     if (req.body.email) {
@@ -56,7 +43,7 @@ class UsersMiddleware {
   }
 
   async extractUserId (req: express.Request, res: express.Response, next: express.NextFunction) {
-    req.body.id = req.params.userId
+    req.body._id = req.params.userId
     next()
   }
 }

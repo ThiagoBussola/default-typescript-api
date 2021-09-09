@@ -1,7 +1,6 @@
 import { CreateUserDto } from '../dto/create.user.dto'
 import { PatchUserDto } from '../dto/patch.user.dto'
 import { PutUserDto } from '../dto/put.user.dto'
-import { PermissionFlag } from '../../common/middleware/common.permissionflag.enum'
 
 import mongooseService from '../../common/services/mongoose.service'
 
@@ -18,8 +17,7 @@ class UsersDao {
     email: String,
     password: { type: String, select: false },
     firstName: String,
-    lastName: String,
-    permissionFlags: Number
+    lastName: String
   },
   { id: false, timestamps: true })
 
@@ -33,8 +31,7 @@ class UsersDao {
     const userId = shortid.generate()
     const user = new this.User({
       _id: userId,
-      ...userFields,
-      permissionFlag: PermissionFlag.FREE_PERMISSION
+      ...userFields
     })
 
     await user.save()
@@ -53,7 +50,7 @@ class UsersDao {
   // through mongoose and filters in searches.
   async getUserByEmailWithPassword (email: string) {
     return this.User.findOne({ email: email })
-      .select('_id email permissionFlags +password')
+      .select('_id email +password')
       .exec()
   }
 

@@ -3,6 +3,8 @@ import jwt from 'jsonwebtoken'
 import crypto from 'crypto'
 import { Jwt } from '../../common/types/jwt'
 import usersService from '../../users/services/users.service'
+import dotenv from 'dotenv'
+dotenv.config()
 
 // @ts-expect-error
 const jwtSecret: string = process.env.JWT_SECRET
@@ -42,8 +44,7 @@ class JwtMiddleware {
     if (hash === req.body.refreshToken) {
       req.body = {
         userId: user._id,
-        email: user.email,
-        permissionFlags: user.permissionFlags
+        email: user.email
       }
       return next()
     } else {

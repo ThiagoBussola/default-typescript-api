@@ -1,5 +1,5 @@
 {
-  "name": "toptal-rest-series",
+  "name": "thiago-bussola-test",
   "version": "0.0.3",
   "description": "A guide to REST API using Typescript created for Toptal blog",
   "main": "index.js",
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/makinhs/toptal-rest-series.git"
+    "url": "https://github.com/ThiagoBussola/default-typescript-api"
   },
   "keywords": [
     "REST",

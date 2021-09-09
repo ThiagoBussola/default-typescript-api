@@ -3,5 +3,4 @@ export interface PutUserDto {
   password: string
   firstName: string
   lastName: string
-  permissionFlags: number
 }
