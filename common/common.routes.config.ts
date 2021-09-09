@@ -10,7 +10,7 @@ export abstract class CommonRoutesConfig {
     this.configureRoutes()
   }
 
-  getName () {
+  getName (): string {
     return this.name
   }
 

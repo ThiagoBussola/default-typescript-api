@@ -46,23 +46,23 @@ class UsersDao {
   }
 
   async getUserByEmail (email: string) {
-    return await this.User.findOne({ email: email }).exec()
+    return this.User.findOne({ email: email }).exec()
   }
 
   // this function is necessary to have the password as we are inhibiting the user from searching the password in any route
   // through mongoose and filters in searches.
   async getUserByEmailWithPassword (email: string) {
-    return await this.User.findOne({ email: email })
+    return this.User.findOne({ email: email })
       .select('_id email permissionFlags +password')
       .exec()
   }
 
   async getUserById (userId: string) {
-    return await this.User.findById({ _id: userId }).exec() // .populate('User')
+    return this.User.findById({ _id: userId }).exec()
   }
 
   async getUsers (limit = 25, page = 0) {
-    return await this.User.find()
+    return this.User.find()
       .limit(limit)
       .skip(limit * page)
       .exec()
@@ -78,7 +78,7 @@ class UsersDao {
   }
 
   async removeUserById (userId: string) {
-    return await this.User.findByIdAndDelete(userId).select('-password').exec()
+    return this.User.findByIdAndDelete(userId).select('-password').exec()
   }
 }
 

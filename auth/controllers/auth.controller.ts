@@ -12,7 +12,8 @@ const tokenExpirationInSeconds = 36000
 class AuthController {
   async createJWT (req: express.Request, res: express.Response) {
     try {
-      const refreshId = `${String(req.body.userId)}${String(jwtSecret)}`
+      // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+      const refreshId = req.body.userId + jwtSecret
       const salt = crypto.createSecretKey(crypto.randomBytes(16))
       const hash = crypto
         .createHmac('sha512', salt)
