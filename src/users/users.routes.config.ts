@@ -4,25 +4,25 @@ import UsersController from './controllers/user.controller'
 import express from 'express'
 import BodyValidationMiddleware from '../common/middleware/body.validation.middleware'
 import { body } from 'express-validator'
+import jwtMiddleware from '../auth/middleware/jwt.middleware'
+import permissionMiddleware from '../common/middleware/common.permission.middleware'
+import { PermissionFlag } from '../common/middleware/common.permissionflag.enum'
 
 export class UsersRoutes extends CommonRoutesConfig {
   constructor (app: express.Application) {
     super(app, 'UserRoutes')
   }
 
-  /*
-  Request: The Request is the way Express.js represents the HTTP request to be handled.
-    This type upgrades and extends the native Node.js request type.
-  Response: The Request is the way Express.js represents the HTTP request to be handled.
-    This type upgrades and extends the native Node.js request type.
-  NextFunction: Serves as a callback function, allowing control to pass through any other middleware functions.
-     Along the way, all middleware will share the same request and response objects before the controller finally sends
-     a response back to the requester.
-  */
-
   configureRoutes () {
     this.app.route('/users')
-      .get(UsersController.listUsers)
+      .get(
+        // adding jwt validation, only authenticated users can list users
+        jwtMiddleware.validJWTNeeded,
+        permissionMiddleware.permissionFlagRequired(
+          PermissionFlag.ADMIN_PERMISSION
+        ),
+        UsersController.listUsers
+      )
       .post(
         body('email').isEmail(),
         body('password').isLength({ min: 5 }).withMessage('Must include password (5+ characters)'),
@@ -34,7 +34,12 @@ export class UsersRoutes extends CommonRoutesConfig {
     this.app.param('userId', UsersMiddleware.extractUserId)
 
     this.app.route('/users/:userId')
-      .all(UsersMiddleware.validateUserExists)
+    // for all routes that include a userId, we want only that same user or an admin to have access
+      .all(
+        UsersMiddleware.validateUserExists,
+        jwtMiddleware.validJWTNeeded,
+        permissionMiddleware.onlySameUserOrAdminCanDoThisAction
+      )
       .get(UsersController.getUserById)
       .delete(UsersController.removeUser)
 
@@ -46,6 +51,10 @@ export class UsersRoutes extends CommonRoutesConfig {
       body('permissionFlags').isInt(),
       BodyValidationMiddleware.verifyBodyFieldsErrors,
       UsersMiddleware.validateSameEmailBelongToSameUser,
+      UsersMiddleware.userCantChangePermission,
+      permissionMiddleware.permissionFlagRequired(
+        PermissionFlag.PAID_PERMISSION
+      ),
       UsersController.put
     ])
 
@@ -57,6 +66,10 @@ export class UsersRoutes extends CommonRoutesConfig {
       body('permissionFlags').isInt().optional(),
       BodyValidationMiddleware.verifyBodyFieldsErrors,
       UsersMiddleware.validatePatchEmail,
+      UsersMiddleware.userCantChangePermission,
+      permissionMiddleware.permissionFlagRequired(
+        PermissionFlag.PAID_PERMISSION
+      ),
       UsersController.patch
     ])
 

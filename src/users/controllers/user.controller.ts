@@ -7,6 +7,16 @@ import usersService from '../services/users.service'
 // we import the argon2 library for password hashing
 import argon2 from 'argon2'
 
+/*
+  Request: The Request is the way Express.js represents the HTTP request to be handled.
+    This type upgrades and extends the native Node.js request type.
+  Response: The Request is the way Express.js represents the HTTP request to be handled.
+    This type upgrades and extends the native Node.js request type.
+  NextFunction: Serves as a callback function, allowing control to pass through any other middleware functions.
+     Along the way, all middleware will share the same request and response objects before the controller finally sends
+     a response back to the requester.
+  */
+
 class UserController {
   async createUser (req: express.Request, res: express.Response) {
     req.body.password = await argon2.hash(req.body.password)

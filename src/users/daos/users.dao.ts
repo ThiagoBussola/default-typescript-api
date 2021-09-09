@@ -1,6 +1,7 @@
 import { CreateUserDto } from '../dto/create.user.dto'
 import { PatchUserDto } from '../dto/patch.user.dto'
 import { PutUserDto } from '../dto/put.user.dto'
+import { PermissionFlag } from '../../common/middleware/common.permissionflag.enum'
 
 import mongooseService from '../../common/services/mongoose.service'
 
@@ -33,12 +34,12 @@ class UsersDao {
     const user = new this.User({
       _id: userId,
       ...userFields,
-      permissionFlag: 1
+      permissionFlag: PermissionFlag.FREE_PERMISSION
     })
 
     await user.save()
-    // como vamos retornar o usuário inteiro na rota o select false não funciona no .save(),
-    // então estamos realizando a busca do usuário recem criado e retornando ele sem a senha
+    // as we are going to return the entire user in the route the select false doesn't work in .save(),
+    // so we are doing the search for the newly created user and returning it without the password
     const findNewUSer = await this.getUserById(user._id)
 
     return findNewUSer
@@ -46,6 +47,14 @@ class UsersDao {
 
   async getUserByEmail (email: string) {
     return await this.User.findOne({ email: email }).exec()
+  }
+
+  // this function is necessary to have the password as we are inhibiting the user from searching the password in any route
+  // through mongoose and filters in searches.
+  async getUserByEmailWithPassword (email: string) {
+    return await this.User.findOne({ email: email })
+      .select('_id email permissionFlags +password')
+      .exec()
   }
 
   async getUserById (userId: string) {
